@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Joint } from "./joint.js" 
 
 //Setup
 let scene, camera, renderer;
@@ -21,74 +22,6 @@ let pointer = {x: 0, y: 0};
 const backgroundLayer = 1;
 const raycaster = new THREE.Raycaster();
 raycaster.layers.set(backgroundLayer);
-
-class Joint {
-    jointObject; 
-    armObject;
-
-    jointEndObject;
-
-    jointSize = .3;
-    armSize = 0.2;
-
-    length;
-
-    constructor(length) {
-        this.length = length;
-
-        const jointGeometry = new THREE.SphereGeometry(this.jointSize);
-        const jointMaterial = new THREE.MeshStandardMaterial( {color: 0xFF00FF });
-        this.jointObject = new THREE.Mesh(jointGeometry, jointMaterial);
-
-        const armGeometry = new THREE.CylinderGeometry(this.armSize, this.armSize, length);
-        const armMaterial = new THREE.MeshStandardMaterial( {color: 0xFFF});
-        this.armObject = new THREE.Mesh(armGeometry, armMaterial);
-
-        //Local
-        this.armObject.rotation.x = -Math.PI * 0.5;
-        this.armObject.position.setZ(length * 0.5);
-       
-
-        const jointEndGeometry = new THREE.BoxGeometry(.1,.1,.1);
-        const jointEndMaterial = new THREE.MeshStandardMaterial( {color: 0xFF0000 });
-        this.jointEndObject = new THREE.Mesh(jointEndGeometry, jointEndMaterial);
-        //this.jointEndObject.visible = false;
-        this.jointEndObject.position.setZ(length);
-
-
-        this.jointObject.add(this.armObject);
-        this.jointObject.add(this.jointEndObject);
-    }
-
-    setPosition(x, y, z) {
-        this.jointObject.position.set(x, y, z);
-    }
-
-    setEndPosition(x, y, z) {
-        const targetEnd = new THREE.Vector3(x, y, z);
-        let rootOffsetFromTarget = new THREE.Vector3();
-        rootOffsetFromTarget.subVectors(this.getPosition(), this.getEndPosition());
-        let target = new THREE.Vector3();
-        target.addVectors(targetEnd, rootOffsetFromTarget);
-
-        this.setPosition(target.x, target.y, target.z);
-    }
-
-    getPosition() {
-        return this.jointObject.position;
-    }
-
-    getEndPosition() {
-        let handleVec = new THREE.Vector3();
-        this.jointEndObject.getWorldPosition(handleVec);
-        handleVec.setZ(0);
-        return handleVec;
-    }
-
-    lookAt(position) {
-        this.jointObject.lookAt(position);
-    }
-}
 
 function setup() {
     //Scene
@@ -131,14 +64,35 @@ function onPointerMove(event) {
 	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 }
 
+//Create joints and add them to an array and to the scene
 function createJoints() {
+    //Create joints except last one
     for (let i = 0; i < jointAmount - 1; i++) {
-        let joint = new Joint(jointLength)
+        //TODO replace with actual geometry
+        const jointGeometry = new THREE.SphereGeometry(.3);
+        const jointMaterial = new THREE.MeshStandardMaterial( {color: 0xFF00FF });
+        const jointMesh = new THREE.Mesh(jointGeometry, jointMaterial);
+        
+        const armGeometry = new THREE.CylinderGeometry(0.2, 0.2, 1);
+        const armMaterial = new THREE.MeshStandardMaterial( {color: 0xFFF});
+        const connectionObject = new THREE.Mesh(armGeometry, armMaterial);
+
+        let joint = new Joint(jointLength, jointMesh, connectionObject);
         joints.push(joint);
         scene.add(joint.jointObject);
     }
 
-    let lastJoint = new Joint(0);
+    //TODO replace with actual geometry
+    const jointGeometry = new THREE.SphereGeometry(.3);
+    const jointMaterial = new THREE.MeshStandardMaterial( {color: 0xFF00FF });
+    const jointMesh = new THREE.Mesh(jointGeometry, jointMaterial);
+
+    const armGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0);
+    const armMaterial = new THREE.MeshStandardMaterial( {color: 0xFFF});
+    const connectionObject = new THREE.Mesh(armGeometry, armMaterial);
+
+    let lastJoint = new Joint(0, jointMesh, connectionObject);
+
     joints.push(lastJoint);
     scene.add(lastJoint.jointObject);
 }

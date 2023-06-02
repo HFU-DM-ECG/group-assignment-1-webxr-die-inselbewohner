@@ -1,20 +1,19 @@
 import * as THREE from 'three';
    
 export class Joint {
+    //Object representing the joint
     jointObject; 
+    //Helper object
     jointEndObject;
-
+    //Length of the joint
     length;
 
     constructor(length, jointObject) {
         this.length = length;
         this.jointObject = jointObject;
 
-
         //Helper object to get the world position at the end of the joint
-        const jointEndGeometry = new THREE.BoxGeometry(.1,.1,.1);
-        const jointEndMaterial = new THREE.MeshStandardMaterial( {color: 0x000000 });
-        this.jointEndObject = new THREE.Mesh(jointEndGeometry, jointEndMaterial);
+        this.jointEndObject = new THREE.Mesh();
         this.jointEndObject.visible = false;
         this.jointEndObject.position.setZ(length);
 
@@ -26,6 +25,7 @@ export class Joint {
         this.jointObject.position.set(x, y, z);
     }
 
+    //Sets position of the joint so that its Endobject is at the specified position
     setEndPosition(x, y, z) {
         const targetEnd = new THREE.Vector3(x, y, z);
         let rootOffsetFromTarget = new THREE.Vector3();
@@ -40,10 +40,11 @@ export class Joint {
         return this.jointObject.position;
     }
 
+    //Returns the world position of the Joints Endobject
     getEndPosition() {
-        let handleVec = new THREE.Vector3();
-        this.jointEndObject.getWorldPosition(handleVec);
-        return handleVec;
+        let endPosition = new THREE.Vector3();
+        this.jointEndObject.getWorldPosition(endPosition);
+        return endPosition;
     }
 
     lookAt(position) {

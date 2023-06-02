@@ -97,8 +97,6 @@ function offsetShoulders(offset) {
     offset = parseFloat(offset);
     rootLOffset.x = -offset;
     rootROffset.x = offset;
-    
-    console.log(rootROffset);
 }
 
 function resizeArm(scale) {

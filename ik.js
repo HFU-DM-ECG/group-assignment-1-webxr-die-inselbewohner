@@ -20,10 +20,10 @@ let jointsL = [];
 const jointLengths = [.9, .85, 0];
 
 //Roots = shoulder positions
-let rootR = new THREE.Vector3(0,0,0);
-let rootL = new THREE.Vector3(0,0,0);
 const rootROffset = new THREE.Vector3(.12, -.15, 0);
 const rootLOffset = new THREE.Vector3(-.12, -.15, 0);
+let rootR = new THREE.Vector3(0, 0, 0);
+let rootL = new THREE.Vector3(0, 0, 0);
 
 setup();
 
@@ -31,24 +31,26 @@ function setup() {
     //Scene
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 1;
 
     //VR
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.xr.enabled = true;
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
+    window.addEventListener("resize", onWindowResize)
     renderer.outputEncoding = THREE.sRGBEncoding;
     document.body.appendChild(renderer.domElement);
     document.body.appendChild(VRButton.createButton(renderer));
     controllers = buildControllers();
 
     //Lights
-	const ambientLight = new THREE.AmbientLight(0x606060, 2);
-	scene.add(ambientLight);
+    const ambientLight = new THREE.AmbientLight(0x606060, 2);
+    scene.add(ambientLight);
 
-	const pointLight = new THREE.PointLight(0x404040, 2, 50);
-	pointLight.position.setZ(3);
-	scene.add(pointLight);
+    const pointLight = new THREE.PointLight(0x404040, 2, 50);
+    pointLight.position.setZ(3);
+    scene.add(pointLight);
 
     //Grid helper
     const gridHelper = new THREE.GridHelper(10, 10);
@@ -56,7 +58,6 @@ function setup() {
 
     //First person control
     controls = new OrbitControls(camera, renderer.domElement);
-    
 
     //Load arms
     const gltfLoader = new GLTFLoader();
@@ -64,7 +65,7 @@ function setup() {
         armL = glb.scene;
         armL.scale.set(1, 1, 1);
         armL.position.set(0, 0, 0);
-       
+
         gltfLoader.load("armR.glb", (glb) => {
             armR = glb.scene;
             armR.scale.set(1, 1, 1);
@@ -72,7 +73,7 @@ function setup() {
             onInitialized();
         });
     });
-   
+
 }
 
 function onInitialized() {
@@ -81,19 +82,31 @@ function onInitialized() {
     renderer.setAnimationLoop(animate);
 }
 
+//Reacts to resize event, doesn't work in VR
+function onWindowResize() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const aspect = width / height;
+
+    renderer.setSize(width, height);
+
+    camera.aspect = aspect;
+    camera.updateProjectionMatrix();
+}
+
 //Called every frame
 function animate() {
     updateRootPositions();
     updateJoints(jointsR, rootR, controllers[0]);
     updateJoints(jointsL, rootL, controllers[1]);
-    
+
     //Only use orbit controls when xr is not active
     controls.enabled = !renderer.xr.isPresenting;
     renderer.render(scene, camera);
 }
 
 //Update root position so arms are always offset relative to the camera
-function updateRootPositions() { 
+function updateRootPositions() {
     let cameraPos;
     if (renderer.xr.isPresenting) {
         cameraPos = renderer.xr.getCamera().cameras[0].position;
@@ -111,7 +124,7 @@ function createJoints(armObject, jointsArray) {
     //children[0] can be used because the child gets removed from its former parent when it is appended to another object
     for (let i = 0; i < 3; i++) {
         //scale arm to simulate real arm length
-        armObject.children[0].scale.set(armScale, armScale, armScale);   
+        armObject.children[0].scale.set(armScale, armScale, armScale);
         let joint = new Joint(jointLengths[i], armObject.children[0]);
         jointsArray.push(joint);
         scene.add(joint.jointObject);
@@ -169,8 +182,3 @@ function buildControllers() {
     }
     return controllers;
 }
-
-
-
-
-

@@ -13,15 +13,15 @@ const showControllers = false;
 
 //Arm objects
 let armR, armL;
-const armScale = 0.2;
+let armScale = 0.2;
 //Joints
 let jointsR = [];
 let jointsL = [];
 const jointLengths = [.9, .85, 0];
 
 //Roots = shoulder positions
-const rootROffset = new THREE.Vector3(.12, -.15, 0);
-const rootLOffset = new THREE.Vector3(-.12, -.15, 0);
+let rootROffset = new THREE.Vector3(.12, -.15, .05);
+let rootLOffset = new THREE.Vector3(-.12, -.15, .05);
 let rootR = new THREE.Vector3(0, 0, 0);
 let rootL = new THREE.Vector3(0, 0, 0);
 
@@ -79,7 +79,34 @@ function setup() {
 function onInitialized() {
     createJoints(armR, jointsR);
     createJoints(armL, jointsL);
+    
+    //Slider for controlling the arm size
+    let armScaleSlider = document.getElementById("arm_scale");
+    resizeArm(armScaleSlider.value);
+    armScaleSlider.addEventListener("change", (event) => resizeArm(event.target.value));
+
+    let offsetShoulderSlider = document.getElementById("shoulder_offset");
+    offsetShoulders(offsetShoulderSlider.value);
+    offsetShoulderSlider.addEventListener("change", (event) => offsetShoulders(event.target.value));
+    
     renderer.setAnimationLoop(animate);
+}
+
+//Offsets shoulders on the x axis
+function offsetShoulders(offset) {
+    offset = parseFloat(offset);
+    rootLOffset.x = -offset;
+    rootROffset.x = offset;
+    
+    console.log(rootROffset);
+}
+
+function resizeArm(scale) {
+    scale = parseFloat(scale);
+    for (let i = 0; i < 3; i++) {
+        jointsR[i].jointObject.scale.set(scale, scale, scale);
+        jointsL[i].jointObject.scale.set(scale, scale, scale);
+    }
 }
 
 //Reacts to resize event, doesn't work in VR
@@ -163,7 +190,7 @@ function updateJoints(joints, root, targetController) {
 }
 
 
-// src: https://codingxr.com/articles/getting-started-with-webxr-and-threejs/
+//build two controllers and add them to the scene
 function buildControllers() {
     const controllerModelFactory = new XRControllerModelFactory();
     const controllers = [];

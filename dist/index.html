@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Group assignment 02 - VR Demo</title>
+    <title>WebXR Assignment 1 - VR Demo</title>
     <style>
         body { 
             margin: 0; 
@@ -20,12 +20,30 @@
             position: absolute;
             left: 0;        
             z-index: 10000 !important;
+            
+        }
+        label {
+            color: white;
+        }
+        .slider_container {
+            z-index: 10000 !important;
+            right: 5px;
+            top: 10px;
+            position:absolute;
         }
     </style>
 
-  <script type="module" crossorigin src="./assets/index-28516213.js"></script>
+  <script type="module" crossorigin src="./assets/index-90452329.js"></script>
 </head>
 <body>
+    <div class="slider_container">
+        <label for="arm_scale">Arm Scale</label> <br>
+        <input type="range" id="arm_scale" min="0.1" max="0.25" value="0.2" step="0.025"> 
+        <br>
+        <label for="shoulder_offset">Shoulder Offset</label> <br>
+        <input type="range" id="shoulder_offset" min="0.01" max="0.2" value="0.12" step="0.025"> 
+    </div>     
+   
 </body>
 
 

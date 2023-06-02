@@ -11,3 +11,4 @@ The hands try to match the position and rotation of the controllers. The final p
 - Requires a VR Headset + Controllers or the WebXR Browser Plugin (Requires 2 Controllers)
 - Visit our application on github pages
 - Move the controllers to move the arms
+- Arm size and shoulder offset can be adjusted by using sliders

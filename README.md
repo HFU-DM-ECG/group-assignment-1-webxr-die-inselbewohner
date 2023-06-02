@@ -8,6 +8,6 @@ This VR application is a demo showcasing the implementation of virtual Arms whic
 The hands try to match the position and rotation of the controllers. The final position and rotation of each part of the arm is calculated with inverse kinematics based on the controllers as the targets. 
 
 ## Usage
-- Requires a VR Headset + Controllers or the WebXR Browser Plugin
+- Requires a VR Headset + Controllers or the WebXR Browser Plugin (Requires 2 Controllers)
 - Visit our application on github pages
 - Move the controllers to move the arms
